@@ -1,0 +1,10 @@
+{
+  "id": "tabs-row",
+  "type": "row",
+  "size": { "px": 42 },
+  "window_drag": true,
+  "children": [
+    { "id": "tabs", "type": "block", "window_drag": true, "content": { "mod": "tabs" } },
+    { "id": "cliamp", "type": "block", "size": { "px": 104 }, "content": { "mod": "cliamp-launcher" } }
+  ]
+}
