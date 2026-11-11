@@ -1,7 +1,7 @@
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { exec, theme, props, run, closeOverlay, setShared, shared, notify } from "herdr";
-import { PROVIDERS, cliampTerminal, snapshot, ctl, launch } from "./lib.js";
+import { PROVIDERS, VIS_FALLBACK, cliampTerminal, snapshot, ctl, launch, visModes } from "./lib.js";
 
 const stop = (_e, cx) => cx.stop_propagation();
 const REPEAT = { Off: ["off", "顺序播放"], All: ["all", "列表循环"], One: ["one", "单曲循环"] };
@@ -10,6 +10,8 @@ const NEXT_REPEAT = { Off: "all", All: "one", One: "off" };
 export default class CliampPlayer extends View {
   init(_props, cx) {
     this.snap = null; this.busy = false; this.more = false; this.vol = 0;
+    this.fx = false; this.modes = VIS_FALLBACK;
+    cx.spawn(async (cx) => { this.modes = await visModes(); cx.notify(); });
     this.min = false;
     this.poll(cx);
     cx.timer.every(2000, (cx) => this.poll(cx));
@@ -121,6 +123,19 @@ export default class CliampPlayer extends View {
       body.child(h_flex().gap(6)
         .child(this.chip("cl-vd", "音量 −", false, (_e, cx) => this.volume(cx, -3)))
         .child(this.chip("cl-vu", "音量 +", false, (_e, cx) => this.volume(cx, 3))));
+      const vis = s?.visualizer ?? "";
+      body.child(h_flex().gap(6)
+        .child(this.chip("cl-fx", `效果:${vis === "None" ? "关" : vis}`, false, (_e, cx) => this.act(cx, "vis", "next")))
+        .child(this.chip("cl-fxall", this.fx ? "全部效果 ▴" : "全部效果 ▾", this.fx, (_e, cx) => { this.fx = !this.fx; cx.notify(); })));
+      if (this.fx) {
+        body.child(h_flex().flex_wrap().gap(4).children(this.modes.map((m) => {
+          const on = m === vis;
+          return div().id(`fx-${m}`).h(24).px(8).flex().items_center().rounded(5).text_size(11)
+            .bg(on ? t.selected : t.raised).text_color(on ? t.foreground : t.muted)
+            .hover((x) => x.bg(t.hover).text_color(t.foreground))
+            .on_mouse_down("left", stop).on_click((_e, cx) => this.act(cx, "vis", m)).child(m === "None" ? "关闭" : m);
+        })));
+      }
       body.child(h_flex().gap(6)
         .child(this.chip("cl-go", "跳到标签", false, () => term && run("pane.focus", { terminal: term.address })))
         .child(this.chip("cl-sw", "切换来源", false, (_e, cx) => this.stopAll(cx)))

@@ -9,7 +9,7 @@ A top-right button + floating player for [Cliamp](https://github.com/bjarneo/cli
 
 - **Pick a source, one click.** Lists Cliamp's providers (NetEase, YouTube Music, Radio, Local, Spotify, Qobuz, Tidal, Bandcamp, SoundCloud, …) and opens a `♪ Cliamp` tab **in the current space** running `cliamp --provider <name> --auto-play`. No more typing the command.
   选一个音乐来源,在当前空间新开 `♪ Cliamp` 标签页并启动,不用再敲命令。
-- **Real player controls** via Cliamp's own CLI/IPC: previous / play-pause / next, shuffle on/off, repeat (off → all → one), volume ±3 dB, jump to the tab, switch source, stop.
+- **Real player controls** via Cliamp's own CLI/IPC: previous / play-pause / next, shuffle on/off, repeat (off → all → one), volume ±3 dB, **visualizer switching** (cycle with one click or pick any of Cliamp's 35 effects), jump to the tab, switch source, stop.
 - **Floating window** you can drag; **minimize** it to a small pill that shows the track and a play/pause button.
 - The top-right button shows a green dot while Cliamp is running.
 
@@ -39,14 +39,15 @@ The mods run these programs through Herdr's `exec` (found on `PATH`):
 | Program | Why |
 |---|---|
 | `cliamp remote state` | poll playback state every 2 s (player) / 4 s (button) |
-| `cliamp toggle/next/prev/shuffle/repeat/volume/status/stop` | the controls |
+| `cliamp toggle/next/prev/shuffle/repeat/volume/vis/status/stop` | the controls (`vis list` is read once to fill the effect picker) |
 | `herdr-app do tab.new …` | open the `♪ Cliamp` tab in the current space |
 
 No network access, and it reads no files outside its own folder.
 
 ## Notes / 注意
 
-- Shuffle and repeat are persisted by Cliamp itself into its `config.toml` — that is Cliamp's behavior, not this mod's.
+- Shuffle, repeat and the visualizer are persisted by Cliamp itself into its `config.toml` — that is Cliamp's behavior, not this mod's.
+- The effect is drawn in the Cliamp terminal tab; the floating window only switches it.
 - Playback state updates lag 1–3 s after a command (Cliamp reports it asynchronously); the player re-polls after each action.
 - The mod finds its terminal by the tab name `♪ Cliamp`; if you rename that tab, "jump to tab" / "switch source" can no longer find it.
 - With the NetEase provider Cliamp stops at the playlist list after launch; pick a playlist in the tab (`--auto-play` does not start playback there).

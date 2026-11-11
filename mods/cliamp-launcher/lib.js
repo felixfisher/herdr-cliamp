@@ -52,3 +52,12 @@ export async function launch(provider) {
   const r = await exec(APP(), args, { timeout: 8000 });
   return r.stdout;
 }
+
+// Visualizer modes (`cliamp vis list`); this list is the fallback if the call fails.
+export const VIS_FALLBACK = ["Bars", "BarsDot", "Rain", "BarsOutline", "Bricks", "Columns", "ClassicPeak", "Wave", "Scatter", "Flame", "Retro", "Pulse", "Matrix", "Binary", "Sakura", "Firework", "Bubbles", "Logo", "Terrain", "Scope", "Heartbeat", "Butterfly", "Ascii", "Firefly", "Mosaic", "Sand", "Geyser", "ClassicLED", "Stereo", "Mirror", "Omarchy", "RedSector", "YinYang", "Ethereal", "None"];
+
+export async function visModes() {
+  const r = await ctl("vis", "list");
+  const names = (r?.stdout ?? "").split("\n").map((l) => l.replace(/^\*?\s*/, "").trim()).filter(Boolean);
+  return names.length ? names : VIS_FALLBACK;
+}
